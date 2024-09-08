@@ -35,6 +35,7 @@ from pymilvus.grpc_gen import schema_pb2 as schema_types
 from .constants import COMMON_TYPE_PARAMS
 from .types import (
     DataType,
+    FunctionType,
     infer_dtype_by_scalar_data,
     infer_dtype_bydata,
     map_numpy_dtype_to_datatype,
@@ -94,6 +95,12 @@ class CollectionSchema:
         self._primary_field = None
         self._partition_key_field = None
         self._clustering_key_field = None
+        self._functions = [schema_types.FunctionSchema(
+                name="test_function",
+                type=schema_types.BM25,
+                input_field_names=["text"],
+                output_field_names=["embedding"],
+            )]
 
         if not isinstance(fields, list):
             raise FieldsTypeException(message=ExceptionsMessage.FieldsType)
@@ -223,6 +230,10 @@ class CollectionSchema:
         return self._fields
 
     @property
+    def functions(self):
+        return self._functions
+
+    @property
     def description(self):
         """
         Returns a text description of the CollectionSchema.
@@ -288,6 +299,15 @@ class CollectionSchema:
         field = FieldSchema(field_name, datatype, **kwargs)
         self._fields.append(field)
         return self
+
+
+class FunctionSchema:
+    def __init__(self, name: str, ftype: FunctionType, input, output):
+        self.name = name
+        self.type = ftype
+        self.input = input
+        self.output = output
+        # TODO AOIASD CHECK INPUT AND OUTPUT NUM BY FTYPE
 
 
 class FieldSchema:
@@ -617,7 +637,7 @@ def check_schema(schema: CollectionSchema):
             DataType.SPARSE_FLOAT_VECTOR,
         ):
             vector_fields.append(field.name)
-    if len(vector_fields) < 1:
+    if len(vector_fields) < 1 and len(schema.functions) == 0:
         raise SchemaNotReadyException(message=ExceptionsMessage.NoVector)
 
 

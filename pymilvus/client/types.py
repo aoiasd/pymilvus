@@ -83,6 +83,10 @@ class Status:
         return self.code == Status.SUCCESS
 
 
+class FunctionType(IntEnum):
+    Unkonwn =0
+    BM25 =1
+
 class DataType(IntEnum):
     NONE = 0
     BOOL = 1

@@ -21,7 +21,7 @@ from pandas.api.types import (
     is_scalar,
 )
 
-from pymilvus.client.types import DataType
+from pymilvus.client.types import DataType,FunctionType
 
 dtype_str_map = {
     "string": DataType.VARCHAR,
@@ -32,6 +32,10 @@ dtype_str_map = {
     "boolean": DataType.BOOL,
     "mixed": DataType.UNKNOWN,
     "bytes": DataType.UNKNOWN,
+}
+
+ftype_str_map = {
+    "bm25": FunctionType.BM25
 }
 
 numpy_dtype_str_map = {

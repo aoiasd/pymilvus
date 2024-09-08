@@ -139,6 +139,9 @@ class Prepare:
                 field_schema.type_params.append(kv_pair)
 
             schema.fields.append(field_schema)
+
+        for f in fields.functions: 
+            schema.functions.append(f)
         return schema
 
     @staticmethod
@@ -226,11 +229,20 @@ class Prepare:
         if "enable_dynamic_field" in fields:
             enable_dynamic_field = fields["enable_dynamic_field"]
 
+        # functions:list = kwargs.get("functions", None)
+        functions_schema = [schema_types.FunctionSchema(
+            name="test_function",
+            type=schema_types.BM25,
+            input_field_names=["text"],
+            output_field_names=["embedding"],
+        )]
+
         schema = schema_types.CollectionSchema(
             name=collection_name,
             autoID=False,
             description=fields.get("description", ""),
             enable_dynamic_field=enable_dynamic_field,
+            functions=functions_schema,
         )
 
         primary_field, auto_id_field = None, None
