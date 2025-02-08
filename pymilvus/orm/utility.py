@@ -1310,3 +1310,12 @@ def list_indexes(
                 # list all indexes of this field.
                 index_name_list.append(index.index_name)
     return index_name_list
+
+def run_analyzer(
+    text,
+    analyzer_params = {},
+    using = "default",
+    timeout: Optional[float] = None,
+):
+    results = _get_connection(using).run_analyzer(text, analyzer_params, timeout)
+    return [result.tokens for result in results]
