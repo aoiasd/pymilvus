@@ -29,6 +29,7 @@ class HybridHits(list):
         all_scores: List[float],
         fields_data: List[schema_pb2.FieldData],
         output_fields: List[str],
+        highlight_results: List[common_pb2.HighlightResult],
         pk_name: str,
     ):
         self.ids = all_pks[start:end]
@@ -90,6 +91,14 @@ class HybridHits(list):
             else:
                 msg = f"Unsupported field type: {field_data.type}"
                 raise MilvusException(msg)
+
+        if len(highlight_results) > 0:
+            for i, hit in enumerate(top_k_res):
+                hit["highlight"] = {
+                    result.field_name: [s for s in result.datas[i + start].fragments]
+                    for result in highlight_results
+                }
+
         super().__init__(top_k_res)
 
     def __str__(self) -> str:
@@ -285,9 +294,11 @@ class SearchResult(list):
                     all_scores,
                     res.fields_data,
                     res.output_fields,
+                    res.highlight_results,
                     _pk_name,
                 )
             )
+
             nq_thres += topk
         return data
 
@@ -658,6 +669,10 @@ class Hit(UserDict):
     def score(self) -> float:
         """Alias of distance, will be deprecated soon"""
         return self.distance
+    
+    @property
+    def highlight(self) ->Dict[str, Any]:
+        return self.data.get("highlight")
 
     @property
     def fields(self) -> Dict[str, Any]:

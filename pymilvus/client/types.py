@@ -136,6 +136,9 @@ class FunctionType(IntEnum):
     TEXTEMBEDDING = 2
     RERANK = 3
 
+class HighlightType(IntEnum):
+    LEXICAL = 0
+    SEMANTIC = 1
 
 class RangeType(IntEnum):
     LT = 0  # less than
